@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -e
+
+PCREGREP=$(command -v pcregrep)
+GREP=$(command -v grep)
+CUT=$(command -v cut)
+OUT=${2:-LVDS1}
+X=$(command -v xrandr)
+ZOOM_RES_IDX=${1:-0}
+
+## xrandr is output 3 spaces before the resolution
+RESOLUTIONS=($(${X} -q | ${PCREGREP} -M 'LVDS1.*(\n\s.*)*' | ${GREP} '^\s' | ${CUT} -d ' ' -f 4))
+
+if [ -n "${RESOLUTIONS[$ZOOM_RES_IDX]}" ]; then
+    ${X} --output ${OUT} --mode ${RESOLUTIONS[$ZOOM_RES_IDX]} --panning ${RESOLUTIONS[0]}
+else
+    echo "No more resolutions."
+fi
