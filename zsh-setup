@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -xue
+
+REPODIR=~/Downloads/loadedRepos
+
+GIT=$(command -v git) || { echo 'Need git.'; exit 1; }
+
+## setup git prompt
+if [ ! -e "${REPODIR}/zsh-git-prompt" ]; then
+    cd ${REPODIR} && ${GIT} clone --depth=1 https://github.com/olivierverdier/zsh-git-prompt.git
+fi
+
+GIT_PROMPT_CONFIG=''
+set +e
+read -r -e -s -d '' GIT_PROMPT_CONFIG <<EOM
+## Add git prompt
+\nsource ${REPODIR}/zsh-git-prompt/zshrc.sh
+\n## an example prompt
+\nPROMPT='%B%F{green}%m %F{blue}%~%b$(git_super_status) %# %b%f%k'
+\nZSH_THEME_GIT_PROMPT_CACHE=1
+EOM
+set -e
+
+if [[ "x$(grep -c 'source.*/zsh-git-prompt/zshrc.sh' ~/.zshrc)x" == "x0x" ]]; then
+    echo -e ${GIT_PROMPT_CONFIG} >> ~/.zshrc
+else
+    echo 'Note: Git prompt already installed.'
+fi
