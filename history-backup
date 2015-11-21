@@ -18,22 +18,22 @@
 #
 
 KEEP=2000
-BASH_HIST=.bash_history
-BACKUP=bash_history_backup/$BASH_HIST.$(date +%Y-%U)
+HISTORY_FILE=${HISTFILE:-${HOME}/.bash_history}
+BACKUP=${HOME}/bash_history_backup/$(basename ${HISTORY_FILE}.$(date +%Y-%U))
 BASE_DIR=~/
 
 cd $BASE_DIR
 mkdir -p bash_history_backup
-if [ -s "$BASH_HIST" -a "$BASH_HIST" -nt "$BACKUP" ]; then
+if [ -s "${HISTORY_FILE}" -a "${HISTORY_FILE}" -nt "${BACKUP}" ]; then
   # history file is newer then backup
-  if [[ -f $BACKUP ]]; then
+  if [[ -f ${BACKUP} ]]; then
     # there is already a backup
-    cp -f $BASH_HIST $BACKUP
+    cp -f ${HISTORY_FILE} ${BACKUP}
   else
     # create new backup, leave last few commands and reinitialize
-    mv -f $BASH_HIST $BACKUP
-    tail -n$KEEP $BACKUP > $BASH_HIST
+    mv -f ${HISTORY_FILE} ${BACKUP}
+    tail -n${KEEP} ${BACKUP} > ${HISTORY_FILE}
     history -r
-    echo "Created new history backup. Kept last $KEEP commands in history"
+    echo "Created new history backup. Kept last ${KEEP} commands in history"
   fi
 fi
